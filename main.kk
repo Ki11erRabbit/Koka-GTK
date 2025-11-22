@@ -1,13 +1,20 @@
 module main
 
-import gobject
-import gio
+import gobject/gobject
+import gobject/gio
+import gtk/gtk
+import gtk/window
 
-fun callback(object: g-application) : () 
-   trace("hello, world")
+fun callback(app: gtk-application) : () 
+  val window = match app.get-active-window
+    Just(window) -> window
+    Nothing -> app.create-window
+  
+  window.present
+
 
 pub fun main()
-   val app = g-application-new()
+   val app = gtk-application-new()
    app.connect-activate(callback)
-   g-application/run(app, [])
+   gtk-application/run(app, [])
    ()

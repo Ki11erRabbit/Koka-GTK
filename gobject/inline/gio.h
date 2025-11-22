@@ -7,8 +7,8 @@ static inline intptr_t kk_g_application_new(kk_context_t* ctx) {
     return (intptr_t)g_application_new(NULL, 0);
 }
 
-static inline int32_t kk_gio_application_run(kk_gio__g_application app, kk_std_core_types__list arg_list, kk_context_t* ctx) {
-    kk_gobject__gobject raw = app.base;
+static inline int32_t kk_gio_application_run(kk_gobject_gio__g_application app, kk_std_core_types__list arg_list, kk_context_t* ctx) {
+    kk_gobject_gobject__gobject raw = app.base;
     kk_integer_t integer = kk_std_core_list_length(arg_list, ctx);
     kk_ssize_t length = kk_integer_clamp_ssize_t(integer, ctx);
     uint8_t **args = kk_malloc(length * sizeof(uint8_t*), ctx);
@@ -31,22 +31,22 @@ static inline int32_t kk_gio_application_run(kk_gio__g_application app, kk_std_c
     GApplication *application = (GApplication *)raw.pointer.ptr;
     int out = g_application_run(application, length, (char**)args);
 
+    for (int i = 0; i < length; i++) {
+        kk_free(args[i], ctx);
+    }
 
     kk_free(args, ctx);
     return out;
 }
 
-static void g_app_connect_callback(kk_gio__g_application app, kk_function_t callback) {
-    printf("getting context\n");
+static void g_app_connect_callback(kk_gobject_gio__g_application app, kk_function_t callback) {
     kk_context_t* ctx = kk_get_context();
-    printf("calling callback\n");
-    kk_function_call(kk_box_t, (kk_function_t, kk_gio__g_application, kk_context_t*), callback, (callback, app, ctx), ctx);
-    printf("called callback\n");
+    kk_function_call(kk_box_t, (kk_function_t, kk_gobject_gio__g_application, kk_context_t*), callback, (callback, app, ctx), ctx);
     kk_free_context();
 }
 
-static inline void kk_g_app_connect_activate(kk_gio__g_application app, kk_function_t callback, kk_context_t* ctx) {
-    kk_gobject__gobject base = app.base;
+static inline void kk_g_app_connect_activate(kk_gobject_gio__g_application app, kk_function_t callback, kk_context_t* ctx) {
+    kk_gobject_gobject__gobject base = app.base;
     kk_block_t* box = kk_block_dup((kk_block_t*)callback.dbox);
     g_signal_connect((GApplication*)(base.pointer.ptr), "activate", G_CALLBACK(g_app_connect_callback), box);
 }

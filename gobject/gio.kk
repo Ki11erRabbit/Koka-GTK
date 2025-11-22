@@ -5,8 +5,8 @@
    use this file except in compliance with the License. A copy of the License
    can be found in the LICENSE file at the root of this distribution.
 ----------------------------------------------------------------------------*/
-module gio
-import gobject
+module gobject/gio
+import gobject/gobject
 import std/cextern
 
 extern import

@@ -11,6 +11,5 @@ pkgs.mkShell {
     gobject-introspection
     dbus-glib
     gtk4
-    gtk3
   ];
 }

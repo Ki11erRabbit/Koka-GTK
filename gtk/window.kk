@@ -5,15 +5,18 @@
    use this file except in compliance with the License. A copy of the License
    can be found in the LICENSE file at the root of this distribution.
 ----------------------------------------------------------------------------*/
-module gobject/gobject
+module gtk/window
 
-import std/cextern
+import gobject/gobject
 
 extern import
-  c file "inline/gobject.h"
+  c file "inline/window.h"
 
-pub struct gobject
-   pointer : c-pointer<int64>
+pub struct gtk-window
+  base : gobject
 
-pub fun gobject/from(ptr : intptr_t) : gobject
-   Gobject(C-pointer(ptr))
+pub fun gtk-window/from(ptr : intptr_t) : gtk-window
+  Gtk-window(gobject/from(ptr))
+
+pub extern gtk-window/present(window : gtk-window) : ()
+  c inline "kk_gtk_window_present(#1, kk_context())"
