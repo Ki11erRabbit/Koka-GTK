@@ -40,9 +40,7 @@ static void g_app_connect_callback(kk_gio__g_application app, kk_function_t call
     printf("getting context\n");
     kk_context_t* ctx = kk_get_context();
     printf("calling callback\n");
-    //kk_function_call(kk_box_t, (kk_gio__g_application, kk_context_t*), callback, (app, ctx), ctx);
-    kk_box_t(*fn_ptr)(kk_gio__g_application, kk_context_t*) = (kk_box_t(*)(kk_gio__g_application, kk_context_t*))kk_kkfun_ptr_unbox(kk_datatype_as_assert(struct kk_function_s*,callback,KK_TAG_FUNCTION, ctx)->fun, ctx);
-    fn_ptr(app, ctx);
+    kk_function_call(kk_box_t, (kk_function_t, kk_gio__g_application, kk_context_t*), callback, (callback, app, ctx), ctx);
     printf("called callback\n");
     kk_free_context();
 }
