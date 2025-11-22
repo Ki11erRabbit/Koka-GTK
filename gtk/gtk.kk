@@ -10,9 +10,21 @@ module gtk/gtk
 import gobject/gobject
 import gobject/gio
 import gtk/window
+import std/num/int32
 
 extern import
   c file "inline/gtk.h"
+
+
+pub type gtk-orientation
+  OrientationVertical
+  OrientationHorizontal
+
+pub fun gtk-orientation/int32(orientation : gtk-orientation) : int32
+  match orientation
+    OrientationVertical -> 1.int32
+    OrientationHorizontal -> 0.int32
+
 
 
 pub struct gtk-application
@@ -27,7 +39,7 @@ pub fun gtk-application/gtk-application-new() : gtk-application
 pub extern gtk-application/run(app : gtk-application, args : list<string>) : int32
   c inline "kk_gtk_application_run(#1, #2, kk_context())"
 
-pub extern g-application/connect-activate(object : gtk-application, callback : (gtk-application) -> ()) : ()
+pub extern gtk-application/connect-activate(object : gtk-application, callback : (gtk-application) -> ()) : ()
   c inline "kk_gtk_app_connect_activate(#1, #2, kk_context())"
 
 extern gtk-application/get-active-window-internal(app : gtk-application) : maybe<intptr_t>

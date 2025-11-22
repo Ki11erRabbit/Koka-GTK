@@ -5,18 +5,13 @@
    use this file except in compliance with the License. A copy of the License
    can be found in the LICENSE file at the root of this distribution.
 ----------------------------------------------------------------------------*/
-module gobject/gobject
+module gtk/widget/core
 
-import std/cextern
+import gobject/gobject
 
-extern import
-  c file "inline/gobject.h"
+pub struct gtk-widget
+  base : gobject
 
-pub struct gobject
-   pointer : c-pointer<int64>
 
-pub fun gobject/from(ptr : intptr_t) : gobject
-   Gobject(C-pointer(ptr))
-
-pub extern gobject/unref(object : gobject) : ()
-   c inline "kk_object_unref(#1, kk_context())"
+pub fun gtk-widget/from(ptr : intptr_t) : gtk-widget
+  Gtk-widget(gobject/from(ptr))
