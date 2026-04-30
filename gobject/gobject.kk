@@ -13,10 +13,7 @@ extern import
   c file "inline/gobject.h"
 
 pub struct gobject
-   pointer : c-pointer<int64>
+   pointer : intptr_t
 
-pub fun gobject/from(ptr : intptr_t) : gobject
-   Gobject(C-pointer(ptr))
-
-pub extern gobject/unref(object : gobject) : ()
-   c inline "kk_object_unref(#1, kk_context())"
+pub extern gobject/from(ptr : i64) : gobject
+   c inline "kk_gobject_from(#1, kk_context())"
