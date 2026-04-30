@@ -20,17 +20,14 @@ extern import
 pub struct gtk-box
   base : gobject
 
-pub fun gtk-box/from(ptr : intptr_t) : gtk-box
+pub fun gtk-box/from(ptr : i64) : gtk-box
   Gtk-box(gobject/from(ptr))
 
 pub fun gtk-box/into(box : gtk-box) : gtk-widget
   Gtk-widget(box.base)
 
-extern gtk-box/gtk-box-new-internal(orientation : int32, spacing : int32) : intptr_t
+pub extern gtk-box/gtk-box-new(orientation : gtk-orientation, spacing : int32) : gtk-box
   c inline "kk_gtk_box_new(#1, #2, kk_context())"
-
-pub fun gtk-box/gtk-box-new(orientation : gtk-orientation, spacing : int) : gtk-box
-  gtk-box/from(gtk-box/gtk-box-new-internal(orientation.int32, spacing.int32))
 
 pub extern gtk-box/append(box : gtk-box, widget : gtk-widget) : ()
   c inline "kk_gtk_box_append(#1, #2, kk_context())"

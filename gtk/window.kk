@@ -16,7 +16,7 @@ extern import
 pub struct gtk-window
   base : gobject
 
-pub fun gtk-window/from(ptr : intptr_t) : gtk-window
+pub fun gtk-window/from(ptr : int64) : gtk-window
   Gtk-window(gobject/from(ptr))
 
 pub fun gtk-window/into(window : gtk-window) : gtk-widget

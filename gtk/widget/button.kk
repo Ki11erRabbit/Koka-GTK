@@ -18,18 +18,14 @@ extern import
 pub struct gtk-button
   base : gobject
 
-pub fun gtk-button/from(ptr : intptr_t) : gtk-button
+pub fun gtk-button/from(ptr : int64) : gtk-button
   Gtk-button(gobject/from(ptr))
 
 pub fun gtk-button/into(button : gtk-button) : gtk-widget
   Gtk-widget(button.base)
 
-
-extern gtk-button/gtk-button-new-with-label-internal(label : string) : intptr_t
+pub extern gtk-button/gtk-button-new-with-label(label : string) : gtk-button
   c inline "kk_gtk_button_new_with_label(#1, kk_context())"
-
-pub fun gtk-button/gtk-button-new-with-label(label : string) : gtk-button
-  gtk-button/from(gtk-button/gtk-button-new-with-label-internal(label))
 
 pub extern gtk-button/connect-clicked(object : gtk-button, callback : (gtk-button) -> ()) : ()
   c inline "kk_gtk_button_connect_clicked(#1, #2, kk_context())"

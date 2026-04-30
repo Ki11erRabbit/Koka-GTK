@@ -6,6 +6,7 @@ import gtk/gtk
 import gtk/window
 import gtk/widget/box
 import gtk/widget/button
+import std/num/int32
 
 fun callback(app: gtk-application) : () 
   val window : gtk-window = match app.get-active-window
@@ -16,8 +17,8 @@ fun callback(app: gtk-application) : ()
   val button = gtk-button-new-with-label("Hello World")
   button.connect-clicked fn (b)
     trace("hello world!")
-  
-  val box = gtk-box-new(OrientationVertical, 0)
+
+  val box = gtk-box-new(OrientationVertical, int32(0))
   box.append(button.into)
 
   window.set-child(box.into)

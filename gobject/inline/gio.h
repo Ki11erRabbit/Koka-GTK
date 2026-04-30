@@ -5,7 +5,6 @@
 
 extern void gobject_free(void*, kk_block_t*, kk_context_t*);
 
-
 static inline struct kk_gobject_gio_G_application kk_g_application_new(kk_context_t* ctx) {
     void* raw = (void*)g_application_new(NULL, 0);
     kk_box_t box = kk_cptr_raw_box((kk_free_fun_t*)gobject_free, raw, ctx);

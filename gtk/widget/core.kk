@@ -13,5 +13,5 @@ pub struct gtk-widget
   base : gobject
 
 
-pub fun gtk-widget/from(ptr : intptr_t) : gtk-widget
+pub fun gtk-widget/from(ptr : int64) : gtk-widget
   Gtk-widget(gobject/from(ptr))
