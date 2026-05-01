@@ -1,3 +1,7 @@
 .koka
 scratch/
 test.out
+.venv/
+*.egg-info/
+__pycache__/
+*.pyc
