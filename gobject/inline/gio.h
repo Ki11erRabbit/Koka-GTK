@@ -38,6 +38,7 @@ static inline int32_t kk_gio_application_run(struct kk_gobject_gio_G_application
         kk_free(args[i], ctx);
     }
     kk_free(args, ctx);
+    g_object_unref((gpointer)raw);
     return out;
 }
 

@@ -18,8 +18,11 @@ pub struct g-application
 pub extern g-application/g-application-new() : g-application
   c inline "kk_g_application_new(kk_context())"
 
+/*
+   This takes ownership of the `g-application`, therefore, don't use the `g-application` after calling this function.
+*/
 pub extern g-application/run(app : g-application, args : list<string>) : int32
   c inline "kk_gio_application_run(#1, #2, kk_context())"
 
-pub extern g-application/connect-activate(object : g-application, callback : (g-application) -> ()) : ()
+pub extern g-application/connect-activate(^object : g-application, callback : (g-application) -> ()) : ()
   c inline "kk_g_app_connect_activate(#1, #2, kk_context())"

@@ -43,6 +43,7 @@ static inline int32_t kk_gtk_application_run(kk_gtk_gtk__gtk_application app, kk
         kk_free(args[i], ctx);
     }
     kk_free(args, ctx);
+    g_object_unref((gpointer)raw);
     return out;
 }
 

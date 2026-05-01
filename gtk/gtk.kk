@@ -34,7 +34,7 @@ pub struct gtk-application
 pub extern gtk-application/gtk-application-new() : gtk-application
   c inline "kk_gtk_app_new(kk_context())"
 
-pub extern gtk-application/run(app : gtk-application, args : list<string>) : int32
+pub extern gtk-application/run(app : gtk-application, args : list<string>) : <ui> int32
   c inline "kk_gtk_application_run(#1, #2, kk_context())"
 
 pub extern gtk-application/connect-activate(object : gtk-application, callback : (gtk-application) -> ()) : ()
