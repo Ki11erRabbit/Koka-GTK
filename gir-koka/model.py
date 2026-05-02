@@ -1,0 +1,156 @@
+def convert_to_koka(name):
+    out = ''
+    for c in name:
+        if c == '.':
+            out = '-'
+        else:
+            out += c.lower()
+    return out
+
+class GType:
+    c_type: str
+    g_type: str
+    koka_type: str
+    abstract = False
+    
+    def __init__(self, ty, NS):
+        self.abstract = False
+        self.c_type = ty.get('{$s}' % NS['c'])
+        self.g_type = ty.get('name')
+        match self.g_type:
+            case 'none':
+                self.koka_type = '()'
+            case 'utf':
+                self.koka_type = 'string'
+            case 'gboolean':
+                self.koka_type = 'bool'
+            case 'gint':
+                self.koka_type = 'int32'
+            case 'gint32':
+                self.koka_type = 'int32'
+            case 'guint32':
+                self.koka_type = 'int32'
+            case 'gint64':
+                self.koka_type = 'int64'
+            case 'gfloat':
+                self.koka_type = 'float32'
+            case 'gdouble':
+                self.koka_type = 'float64'
+            case the_ty:
+                self.abstract = True
+                self.koka_type = convert_to_koka(the_ty)
+
+    def get_koka_type(self):
+        return self.koka_type
+
+    def get_c_type(self):
+        return self.c_type
+    
+    def get_g_type(self):
+        return self.g_type
+    
+    def is_abstract(self):
+        return self.abstract
+    
+    
+class GFunctionParam:
+    the_type: GType
+    name: str
+    direction: str = 'in'
+    transfer_ownership: bool = False
+    nullable: bool = False
+
+class GFunction:
+    return_type: GType
+    return_type_nullable = False
+    return_type_transfers_ownership = "none"
+    parameters = []
+
+    def __init__(self, parameters, return_type):
+        self.parameters = parameters
+        self.return_type = return_type
+
+    def transfer_ownership_full(self):
+        self.return_type_transfers_ownership = 'full'
+    
+    def transfer_ownership_container(self):
+        self.return_type_transfers_ownership = 'container'
+
+
+class GProperty:
+    name: str
+    the_type: GType
+    writable: bool = True
+    construct_only: bool = False
+    transfer_ownership = "none"
+
+    def __init__(self, name, the_type):
+        self.name = name
+        self.the_type = the_type
+
+    def make_read_only(self):
+        self.writable = False
+
+    def make_construct_only(self):
+        self.construct_only = True
+    
+    def transfer_ownership_full(self):
+        self.transfer_ownership = 'full'
+    
+    def transfer_ownership_container(self):
+        self.transfer_ownership = 'container'
+
+class GSignal:
+    name: str
+    return_type: GType
+    return_type_nullable = False
+    parameters = []
+    detailed: bool = False
+
+    @staticmethod
+    def no_params(return_type):
+        out = GSignal()
+        out.return_type = return_type
+        return out
+
+    @staticmethod
+    def with_params(parameters, return_type):
+        out = GSignal()
+        out.parameters = parameters
+        out.return_type = return_type
+        return out
+    
+    def make_detailed(self):
+        self.detailed = True
+
+class GField:
+    name: str
+    the_type: GType
+    writable: bool = False
+
+    def __init__(self, name, the_type):
+        self.name = name
+        self.the_type = the_type
+
+    def make_read_only(self):
+        self.writable = False
+
+class GImplements:
+    name: str
+    get_type: str
+
+    def __init__(self, name, get_type):
+        self.name = name
+        self.get_type = get_type
+
+class GClass:
+    constructors = []
+    methods = []
+    functions = []
+    properties = []
+    signals = []
+    fields = []
+    implements = []
+
+    def __init__(self):
+        pass
