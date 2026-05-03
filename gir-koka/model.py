@@ -15,7 +15,7 @@ class GType:
     
     def __init__(self, ty, NS):
         self.abstract = False
-        self.c_type = ty.get('{$s}' % NS['c'])
+        self.c_type = ty.get('{$s}type' % NS['c'])
         self.g_type = ty.get('name')
         match self.g_type:
             case 'none':
@@ -27,6 +27,8 @@ class GType:
             case 'gint':
                 self.koka_type = 'int32'
             case 'gint32':
+                self.koka_type = 'int32'
+            case 'guint':
                 self.koka_type = 'int32'
             case 'guint32':
                 self.koka_type = 'int32'
@@ -93,21 +95,16 @@ class GProperty:
     construct_only: bool = False
     transfer_ownership = "none"
 
-    def __init__(self, name, the_type):
+    def __init__(self, name, the_type, transfer_ownership):
         self.name = name
         self.the_type = the_type
+        self.transfer_ownership = transfer_ownership
 
     def make_read_only(self):
         self.writable = False
 
     def make_construct_only(self):
         self.construct_only = True
-    
-    def transfer_ownership_full(self):
-        self.transfer_ownership = 'full'
-    
-    def transfer_ownership_container(self):
-        self.transfer_ownership = 'container'
 
 class GSignal:
     name: str
@@ -116,18 +113,10 @@ class GSignal:
     parameters = []
     detailed: bool = False
 
-    @staticmethod
-    def no_params(return_type):
-        out = GSignal()
-        out.return_type = return_type
-        return out
-
-    @staticmethod
-    def with_params(parameters, return_type):
-        out = GSignal()
-        out.parameters = parameters
-        out.return_type = return_type
-        return out
+    def __init__(self, name, return_type, parameters):
+        self.name = name
+        self.return_type = return_type
+        self.parameters = parameters
     
     def make_detailed(self):
         self.detailed = True
@@ -141,8 +130,8 @@ class GField:
         self.name = name
         self.the_type = the_type
 
-    def make_read_only(self):
-        self.writable = False
+    def make_writable(self):
+        self.writable = True
 
 class GImplements:
     name: str

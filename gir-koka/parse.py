@@ -16,7 +16,7 @@ NS = {
 
 def parse_parameter(param):
     name = param.get('name')
-    the_type = model.GType(param.get('type').get('name'), NS)
+    the_type = model.GType(param.get('type'), NS)
     direction = x if (x := param.get('direction')) is not None else 'in'
     transfer_ownership = param.get('transfer-ownership')
     nullable = (True if y == "1" else False) if (y := param.get('nullable')) is not None or (y := param.get('allow-none')) else False
@@ -25,6 +25,8 @@ def parse_parameter(param):
 
 def parse_parameters(params, method=False):
     parameters = []
+    if params is None:
+        return parameters
     if method:
         instance_param = parse_parameter(params.get('instance-parameter'))
         parameters.append(instance_param)
@@ -41,7 +43,7 @@ def parse_function(fun, method=False, virtual=False):
     return_value = fun.get('return-value')
     transfer_ownership = return_value.get('transfer-ownership')
     nullable = True if return_value.get('nullable') == "1" else False
-    return_type = model.GType(return_value.get('name'), NS)
+    return_type = model.GType(return_value.get('type'), NS)
     if virtual:
         invoker = fun.get('invoker')
     else:
@@ -51,6 +53,50 @@ def parse_function(fun, method=False, virtual=False):
     function = model.GFunction(name, c_name, parameters, return_type, transfer_ownership, nullable, invoker)
     return function
 
+def parse_property(prop):
+    name = prop.get('name')
+    the_type = model.GType(prop.get('type'), NS)
+    writeable = (True if x == '1' else False) if (x := prop.get('writeable')) is not None else False
+    transfer_ownership = prop.get('transfer-ownership')
+    construct_only = (True if x == '1' else False) if (x := prop.get('construct-only')) is not None else False
+
+    out = model.GProperty(name, the_type, transfer_ownership)
+    if not writeable:
+        out.make_read_only()
+    if construct_only:
+        out.make_construct_only()
+    
+    return prop
+
+def parse_signal(sig):
+    name = sig.get('name')
+    return_value = sig.get('return-value')
+    return_type = model.GType(return_value.get('type'), NS)
+    detailed = (True if x == '1' else False) if (x := sig.get('detailed')) is not None else False
+
+    parameters = parse_parameters(sig.get('parameters'))
+
+    signal = model.GSignal(name, return_type, parameters)
+    if detailed:
+        signal.make_detailed()
+
+    return signal
+
+def parse_field(field):
+    private = (True if x == '1' else False) if (x := field.get('private')) is not None else False
+    unreadable = (True if x == '0' else False) if (x := field.get('readable')) is not None else False
+    if private or unreadable:
+        return None
+    
+    name = field.get('name')
+    the_type = model.GType(field.get('type'), NS)
+    writable = (True if x == '1' else False) if (x := field.get('writable')) is not None else False
+
+    field = model.GField(name, the_type)
+    if writable:
+        field.make_writable()
+
+    return field
 
 def parse_class(cls):
     name = cls.get('name')
@@ -79,22 +125,24 @@ def parse_class(cls):
 
     properties = []
     for property in cls.findall('core:property', NS):
-        pass
+        properties.append(parse_property(property))
     out.properties = properties
 
     signals = []
     for signal in cls.findall('core:signal', NS):
-        pass
+        signals.append(parse_signal(signal))
     out.signals = signals
 
     fields = []
     for field in cls.findall('core:field', NS):
-        pass
+        field = parse_field()
+        if field is not None:
+            fields.append(field)
     out.fields = fields
 
     implements = set()
     for implement in cls.findall('core:implements'):
-        implements.add(implement)
+        implements.add(implement.get('name'))
     out.implements = implements
 
     return out
