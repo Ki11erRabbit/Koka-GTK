@@ -8,14 +8,30 @@ def convert_to_koka(name):
     return out
 
 class GType:
+    
+    @staticmethod
+    def new(parent, NS):
+        node = parent.find('core:type', NS)
+        if node is None:
+            node = parent.find('core:array', NS)
+            if node is not None:
+                param = GNormalType(node.find('core:type', NS), NS)
+                return GArrayType(param)
+        else:
+            return GNormalType(node, NS)
+
+class GNormalType(GType):
     c_type: str
     g_type: str
     koka_type: str
     abstract = False
     
-    def __init__(self, ty, NS):
+    def __init__(self, ty=None, NS=None):
+        super().__init__()
+        if ty is None and NS is None:
+            return
         self.abstract = False
-        self.c_type = ty.get('{$s}type' % NS['c'])
+        self.c_type = ty.get('{%s}type' % NS['c'])
         self.g_type = ty.get('name')
         match self.g_type:
             case 'none':
@@ -53,8 +69,15 @@ class GType:
     
     def is_abstract(self):
         return self.abstract
+
+class GArrayType(GType):
+    param_type: GType
     
-    
+    def __init__(self, param_type):
+        super().__init__()
+        self.param_type = param_type
+
+
 class GFunctionParam:
     the_type: GType
     name: str

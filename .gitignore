@@ -5,3 +5,4 @@ test.out
 *.egg-info/
 __pycache__/
 *.pyc
+Gtk-3.0.gir
