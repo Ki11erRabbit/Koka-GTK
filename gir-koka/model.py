@@ -60,21 +60,30 @@ class GFunctionParam:
     transfer_ownership: bool = False
     nullable: bool = False
 
+    def __init__(self, name, the_type, transfer_ownership, direction, nullable):
+        self.name = name
+        self.the_type = the_type
+        self.transfer_ownership = transfer_ownership
+        self.direction = direction
+        self.nullable = nullable
+
 class GFunction:
+    name: str
+    c_name: str
     return_type: GType
     return_type_nullable = False
     return_type_transfers_ownership = "none"
     parameters = []
+    invoker: str
 
-    def __init__(self, parameters, return_type):
+    def __init__(self, name, c_name, parameters, return_type, transfer_ownership, return_nullable=False, invoker=''):
+        self.name = name
+        self.c_name = c_name
         self.parameters = parameters
         self.return_type = return_type
-
-    def transfer_ownership_full(self):
-        self.return_type_transfers_ownership = 'full'
-    
-    def transfer_ownership_container(self):
-        self.return_type_transfers_ownership = 'container'
+        self.return_type_transfers_ownership = transfer_ownership
+        self.return_type_nullable = return_nullable
+        self.invoker = invoker
 
 
 class GProperty:
@@ -144,13 +153,18 @@ class GImplements:
         self.get_type = get_type
 
 class GClass:
+    name: str
+    parent: str
+    the_type: GType
     constructors = []
     methods = []
     functions = []
     properties = []
     signals = []
     fields = []
-    implements = []
+    implements = {}
 
-    def __init__(self):
-        pass
+    def __init__(self, name, parent, the_type):
+        self.name = name
+        self.parent = parent
+        self.the_type = the_type
