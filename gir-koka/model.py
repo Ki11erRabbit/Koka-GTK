@@ -7,6 +7,24 @@ def convert_to_koka(name):
             out += c.lower()
     return out
 
+def pascal_to_koka(name, capitals=set(list("ABCDEFGHIJKLMNOPQRSTUVWXYZ"))):
+    first_char = True
+    output = ''
+    for c in name:
+        if first_char and c in capitals:
+            output += c.lower()
+        elif c in capitals:
+            output += '-' + c.lower()
+        else:
+            output += c
+        first_char = False
+    return output
+
+
+class NotRepresentable(Exception):
+    def __init__(self, *args):
+        super().__init__(*args)
+
 class GType:
     
     @staticmethod
@@ -17,6 +35,7 @@ class GType:
             if node is not None:
                 param = GNormalType(node.find('core:type', NS), NS)
                 return GArrayType(param)
+            raise NotRepresentable
         else:
             return GNormalType(node, NS)
 
@@ -56,7 +75,7 @@ class GNormalType(GType):
                 self.koka_type = 'float64'
             case the_ty:
                 self.abstract = True
-                self.koka_type = convert_to_koka(the_ty)
+                self.koka_type = pascal_to_koka(the_ty)
 
     def get_koka_type(self):
         return self.koka_type
@@ -76,6 +95,9 @@ class GArrayType(GType):
     def __init__(self, param_type):
         super().__init__()
         self.param_type = param_type
+
+    def get_koka_type(self):
+        return f'vector<{self.param_type.get_koka_type()}>'
 
 
 class GFunctionParam:
@@ -180,3 +202,13 @@ class GClass:
         self.name = name
         self.parent = parent
         self.the_type = the_type
+
+
+class GFile:
+    namespace: str
+    
+    def __init__(self, namespace: str):
+        self.namespace = namespace
+
+    def set_classes(self, classes):
+        self.classes = classes

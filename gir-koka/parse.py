@@ -28,10 +28,10 @@ def parse_parameters(params, method=False):
     if params is None:
         return parameters
     if method:
-        instance_param = parse_parameter(params.get('instance-parameter'))
+        instance_param = parse_parameter(params.find('core:instance-parameter', NS))
         parameters.append(instance_param)
     
-    for param in params.findall('core:parameter'):
+    for param in params.findall('core:parameter', NS):
         parameters.append(parse_parameter(param))
 
     return parameters
@@ -39,12 +39,8 @@ def parse_parameters(params, method=False):
 
 def parse_function(fun, method=False, virtual=False):
     name = fun.get('name')
-    print(name)
     c_name = fun.get('{%s}identifier' % NS['c'])
-    print(c_name)
     return_value = fun.find('core:return-value', NS)
-    for child in return_value:
-        print('\t', child.tag, child.attrib)
     transfer_ownership = x if (x := return_value.get('transfer-ownership')) is not None else 'none'
     nullable = True if return_value.get('nullable') == "1" else False
     return_type = model.GType.new(return_value, NS)
@@ -53,7 +49,7 @@ def parse_function(fun, method=False, virtual=False):
     else:
         invoker = ''
 
-    parameters = parse_parameters(fun.get('parameters'),method=method)
+    parameters = parse_parameters(fun.find('core:parameters', NS),method=method)
     function = model.GFunction(name, c_name, parameters, return_type, transfer_ownership, nullable, invoker)
     return function
 
@@ -112,24 +108,37 @@ def parse_class(cls):
     the_type.abstract = True
     the_type.c_type = c_type
     the_type.g_type = g_type
+    the_type.koka_type = model.pascal_to_koka(g_type)
 
     out = model.GClass(name, parent, the_type)
 
     constructors = []
     for constructor in cls.findall('core:constructor', NS):
-        constructors.append(parse_function(constructor))
+        try:
+            constructors.append(parse_function(constructor))
+        except model.NotRepresentable:
+            pass
     out.constructors = constructors
     
     methods = []
     for method in cls.findall('core:method', NS):
-        methods.append(parse_function(method, method=True))
+        try:
+            methods.append(parse_function(method, method=True))
+        except model.NotRepresentable:
+            pass
     for method in cls.findall('core:virtual-method', NS):
-        methods.append(parse_function(method, method=True, virtual=True))
+        try:
+            methods.append(parse_function(method, method=True, virtual=True))
+        except model.NotRepresentable:
+            pass
     out.methods = methods
     
     functions = []
     for function in cls.findall('core:function', NS):
-        functions.append(parse_function(function))
+        try:
+            functions.append(parse_function(function))
+        except model.NotRepresentable:
+            pass
     out.functions = functions
 
     properties = []
@@ -170,8 +179,13 @@ def parse_file(path: str):
     tree = etree.parse(path)
     root = tree.getroot()
     ns = root.find('core:namespace', NS)
+
+    file = model.GFile(ns.get('name'))
+
     classes = parse_classes(ns)
-    return classes
+    file.set_classes(classes)
+
+    return file
 
 import sys
 if __name__ == '__main__':

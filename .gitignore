@@ -6,3 +6,7 @@ test.out
 __pycache__/
 *.pyc
 Gtk-3.0.gir
+gir-koka/parse.py
+tags
+out.txt
+tags
